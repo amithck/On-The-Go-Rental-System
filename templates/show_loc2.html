@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<form action="{% url 'show_loc2' %}" method="POST">
+        {% csrf_token %}
+        {{form}}
+        <div>
+            Location:<input type="text" name="loc">
+        </div>
+        <div>
+            <input type="submit" value="Search">
+        </div>
+</form>
+<div class="container">
+    <div class="row mt04">
+        <div class="col-md-10 offset-md-1">
+            {{m | safe}}
+        </div>
+    </div>
+</html>

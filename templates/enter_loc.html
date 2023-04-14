@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Location
+    </title>
+</head>
+<h1>Sign In</h1>
+<form action="{% url 'show_loc' %}" method="POST">
+    {% csrf_token %}
+    {{form}}
+    <div>
+        Latitude:<input type="text" name="lat">
+    </div>
+    <div>
+        Longitude:<input type="text" name="lon">
+    </div>
+    <div>
+        <input type="submit" value="Sign In">
+    </div>
+</form>
+
+</html>

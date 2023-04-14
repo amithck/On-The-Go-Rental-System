@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Map</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">Solo</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link map" href="/show_loc">Map</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link map" href="/signout">Sign Out</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link map" href="/update_balance">Update Balance</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link map" href="/show_transactions">Show Transactions</a>
+          </li>
+        </ul>
+        <form class="d-flex" role="search" method="POST">
+          {% csrf_token %}
+          <input class="form-control me-2" type="search" placeholder="From" aria-label="Search" name="from"
+            autocomplete="off">
+          <input class="form-control me-2" type="search" placeholder="To" aria-label="Search" name="to"
+            autocomplete="off">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="row mt04">
+      <div class="col-md-10 offset-md-1">
+        {{m | safe}}
+      </div>
+    </div>
+  </div>
+
+  <table class="table">
+    <form action="{% url 'rent_cal' %}" method="POST">
+      {% csrf_token %}
+      {{form}}
+      <thead>
+        <tr>
+          <th scope="col">Terminal Name</th>
+          <th scope="col">Distance From Start</th>
+          <th scope="col">Distance From End</th>
+          <th scope="col">No of Bikes</th>
+          <th scope="col">Start</th>
+          <th scope="col">End</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in query_results %}
+        <tr>
+          <td>{{item.term_id.term_name}}</td>
+          <td>{{item.startdistance}} meters</td>
+          <td>{{item.enddistance}} meters</td>
+          <td>{{item.term_id.no_of_bikes}}</td>
+          <td>
+            <input class="form-check-input" type="radio" name="startloc" value={{item.term_id.term_id}} aria-label="..." required/>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="endloc" value={{item.term_id.term_id}} aria-label="..." required/>
+          </td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <td>
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
+          </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tbody>
+
+    </form>
+  </table>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

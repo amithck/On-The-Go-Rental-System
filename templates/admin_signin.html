@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Admin Sign In
+    </title>
+</head>
+<h1>Sign In</h1>
+<form action="{% url 'admin_signin' %}" method="POST">
+    {% csrf_token %}
+    {{form}}
+    <div>
+        Email:<input type="email" name="email1">
+    </div>
+    <div>
+        Password:<input type="password" name="pass1">
+    </div>
+    <div>
+        <input type="submit" value="Sign In">
+    </div>
+</form>
+
+</html>
