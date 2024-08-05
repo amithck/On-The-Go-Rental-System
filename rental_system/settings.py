@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -81,11 +82,11 @@ WSGI_APPLICATION = 'rental_system.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'rental_system',
-        'USER':'root',
-        'PASSWORD':'amith',
-        'HOST':'localhost',
-        'PORT':'3306',
+        'NAME': config('MYSQL_DATABASE'),
+        'USER': config('MYSQL_ROOT_USER'),
+        'PASSWORD': config('MYSQL_ROOT_PASSWORD'),
+        'HOST': config('DB_HOST', 'db'),  # Use 'db' as default from .env
+        'PORT': config('DB_PORT', '3306'),  # Use '3306' as default from .env
     }
 }
 
@@ -125,6 +126,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
