@@ -1,74 +1,79 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import auth
 from .forms import authform
-from django.db import connection
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
-from django.contrib.auth import logout
-from django.shortcuts import redirect
+from django.contrib.auth import authenticate, login, logout
+from common.auth_helpers import is_admin_user
+from django.db import IntegrityError
 
 
 
 
 def signup(request):
     if request.user.is_authenticated:
-        return redirect('http://127.0.0.1:8000/')
+        return redirect('/')
+
+    error = ''
     form = authform()
     if request.method == 'POST':
-        email=request.POST['email']
-        fname=request.POST['fname']
-        lname=request.POST['lname']
-        password=request.POST['pass']
-        phone=request.POST['phone']
-        dl_num=request.POST['dl_num']
+        email = request.POST.get('email', '').strip()
+        fname = request.POST.get('fname', '').strip()
+        lname = request.POST.get('lname', '').strip()
+        password = request.POST.get('pass', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        dl_num = request.POST.get('dl_num', '').strip()
+
+        if not email or not password:
+            error = 'Email and password are required.'
+        elif User.objects.filter(username=email).exists() or auth.objects.filter(email=email).exists():
+            error = 'A user with this email already exists.'
+        else:
+            try:
+                auth.objects.create(
+                    email=email,
+                    fname=fname,
+                    lname=lname,
+                    password=password,
+                    phone=phone,
+                    dl_num=dl_num,
+                    balance=0,
+                )
+                user = User.objects.create_user(username=email, email=email, password=password)
+                user.first_name = fname
+                user.last_name = lname
+                user.save()
+                return redirect('signin')
+            except IntegrityError:
+                error = 'Unable to create account. Please check your details and try again.'
+
+    return render(request, 'signup.html', {'form': form, 'error': error})
 
 
-        new_user= auth(email=email,fname=fname,lname=lname,password=password,phone=phone,dl_num=dl_num,balance=0)
-        new_user.save()
-        user = User.objects.create_user(email, email, password)
-        user.first_name = fname
-        user.last_name = lname
-        user.save()
-    return render(request, 'signup.html')
-        
 def signin(request):
-    f=''
-    response={'f':f}
     if request.user.is_authenticated:
-        return redirect('http://127.0.0.1:8000/')
+        return redirect('/')
+
+    error = ''
     if request.method == 'POST':
-        email=request.POST['email1']
-        password=request.POST['pass1']
+        email = request.POST.get('email1', '').strip()
+        password = request.POST.get('pass1', '').strip()
         user = authenticate(username=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('http://127.0.0.1:8000/')
-        else:
-            f='Login Failed. Please try again.'
-            response={'f':f}
-    return render(request, 'signin.html',response)
+            return redirect('/')
+        error = 'Login failed. Please try again.'
+
+    return render(request, 'signin.html', {'error': error})
 
 def signout(request):
     logout(request)
-    return redirect('http://127.0.0.1:8000/')
+    return redirect('/')
 
 def homepage(request):
-    flag=(admin_required(request))
-    if (flag==1):
+    if is_admin_user(request.user):
         return render(request, 'homepage_admin.html')
-    elif request.user.is_authenticated:
+    if request.user.is_authenticated:
         return render(request, 'homepage_loggedin.html')
-    else:
-        return render(request, 'homepage.html')
+    return render(request, 'homepage.html')
 
 
-def admin_required(request):
-    current_user = request.user
-    flag=0
-    with connection.cursor() as cursor:
-        cursor.execute("select * from admin_app_admins")
-        adm=cursor.fetchall()
-    for adm1 in adm:
-        if(str(current_user) == str(adm1[0])):
-            flag = 1
-    return flag

@@ -39,7 +39,9 @@
     <table class="table">
         <form action="{% url 'signin' %}" method="POST">
           {% csrf_token %}
-          {{form}}
+          {% if error %}
+            <tr><td colspan="5"><div class="alert alert-danger" role="alert">{{ error }}</div></td></tr>
+          {% endif %}
           <thead>
             <tr>
               <th scope="col">Receipt Number</th>
